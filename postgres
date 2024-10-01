@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Usage function to display help
+usage() {
+    echo "Usage:"
+    echo "  $0 create -e <db_endpoint> -P <postgres_user> -W <postgres_pass> -D <postgres_db> -n <db_name>"
+    echo "  $0 access -u <db_user> -p <db_password> -r <db_readonly_name> -e <db_endpoint> -P <postgres_user> -W <postgres_pass> -D <postgres_db> -A <admin_db>"
+    echo "  $0 write -u <db_user> -p <db_password> -n <db_name> -e <db_endpoint> -P <postgres_user> -W <postgres_pass> -D <postgres_db> -A <admin_db>"
+    exit 1
+}
+
+# Initialize variables
+DB_ENDPOINT=""
+DB_USER=""
+DB_PASSWORD=""
+DB_NAME=""
+DB_READONLY_NAME=""
+POSTGRES_USER=""
+POSTGRES_PASS=""
+POSTGRES_DB=""
+ADMIN_USER_DB=""
+COMMAND=""
+
+# Parse command-line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        create)
+            COMMAND="create"
+            ;;
+        access)
+            COMMAND="access"
+            ;;
+        write)
+            COMMAND="write"
+            ;;
+        -e|--endpoint) DB_ENDPOINT="$2"; shift ;;
+        -u|--user) DB_USER="$2"; shift ;;
+        -p|--password) DB_PASSWORD="$2"; shift ;;
+        -n|--dbname) DB_NAME="$2"; shift ;;
+        -r|--readonly-name) DB_READONLY_NAME="$2"; shift ;;
+        -P|--postgres-user) POSTGRES_USER="$2"; shift ;;
+        -W|--postgres-pass) POSTGRES_PASS="$2"; shift ;;
+        -D|--postgres-db) POSTGRES_DB="$2"; shift ;;
+        -A|--admin-db) ADMIN_USER_DB="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; usage ;;
+    esac
+    shift
+done
+
+# Execute corresponding script based on the command
+case $COMMAND in
+    create)
+        # Validate required parameters for create.sh
+        if [[ -z "$DB_ENDPOINT" || -z "$POSTGRES_USER" || -z "$POSTGRES_PASS" || -z "$POSTGRES_DB" || -z "$DB_NAME" ]]; then
+            echo "Error: Missing required parameters for create."
+            usage
+        fi
+        ./create.sh "$DB_ENDPOINT" "$POSTGRES_USER" "$POSTGRES_PASS" "$POSTGRES_DB" "$DB_NAME"
+        ;;
+    access)
+        # Validate required parameters for access.sh
+        if [[ -z "$DB_USER" || -z "$DB_PASSWORD" || -z "$DB_READONLY_NAME" || -z "$DB_ENDPOINT" || -z "$POSTGRES_USER" || -z "$POSTGRES_PASS" || -z "$POSTGRES_DB" || -z "$ADMIN_USER_DB" ]]; then
+            echo "Error: Missing required parameters for access."
+            usage
+        fi
+        ./access.sh "$DB_USER" "$DB_PASSWORD" "$DB_READONLY_NAME" "$DB_ENDPOINT" "$POSTGRES_USER" "$POSTGRES_PASS" "$POSTGRES_DB" "$ADMIN_USER_DB"
+        ;;
+    write)
+        # Validate required parameters for write.sh
+        if [[ -z "$DB_USER" || -z "$DB_PASSWORD" || -z "$DB_NAME" || -z "$DB_ENDPOINT" || -z "$POSTGRES_USER" || -z "$POSTGRES_PASS" || -z "$POSTGRES_DB" || -z "$ADMIN_USER_DB" ]]; then
+            echo "Error: Missing required parameters for write."
+            usage
+        fi
+        ./write.sh "$DB_USER" "$DB_PASSWORD" "$DB_NAME" "$DB_ENDPOINT" "$POSTGRES_USER" "$POSTGRES_PASS" "$POSTGRES_DB" "$ADMIN_USER_DB"
+        ;;
+    *)
+        echo "Unknown command: $COMMAND"
+        usage
+        ;;
+esac
