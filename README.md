@@ -94,7 +94,7 @@ if you want , u can add these scripts in postgress accordingly.
 ### Example Command:
 To manage user access and permissions:
 ```bash
-./postgres access -e "kalp-rnd-ca-db.ciimdxxuhyuf.ap-south-1.rds.amazonaws.com" -W "FxMfQV9uUWGj0y01qwi" -P "postgres99" -D "postgres" -n "invoke" -u "testing" -p "testing" -A "db_had_table"
+./postgres access -e "postgres-project.ap-south-1.rds.amazonaws.com" -W "password" -P "postgres99" -D "postgres" -n "invoke" -u "testing" -p "testing" -A "db_had_table"
 ```
 
 ## Contributing
